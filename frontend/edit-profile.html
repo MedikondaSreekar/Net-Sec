@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container1">
+        <h2>Edit Your Profile</h2>
+        
+        <!-- Profile Picture -->
+        <div class="profile-wrapper">
+            
+            <img src="" alt="" id="profilePic" class="profile-image">
+        </div>
+        <div class="profile-input">
+           
+            <input type="file" id="profilePicInput" accept="image/*">
+        </div>
+        <!-- Edit Form -->
+        <form id="editProfileForm" class="form-container">
+            <!-- Username (Read-Only) -->
+            <label for="username"><strong>Username:</strong></label>
+            <div class="profile-input">
+                <output type="username" id="username" placeholder="username"></output>
+            </div>
+        
+            <!-- Email -->
+            <label for="email"><strong>Email:</strong></label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+
+            <!-- Balance (Read-Only) -->
+
+            <!-- Bio -->
+            <form>
+                <div class="form-group">
+                    <!-- <label for="bio"><strong>Bio:</strong></label> -->
+
+                </div>
+                <div class="form-group">
+                    <textarea id="bio" placeholder="Enter your bio" ></textarea>
+                </div>
+            </form>
+
+            <!-- Save Changes Button -->
+            <button type="button" onclick="saveChanges()" class="btn save-btn">Save Changes</button>
+        </form>
+
+        <!-- Cancel Button -->
+        <button onclick="goBack()" class="btn cancel-btn">Cancel</button>
+    </div>
+
+    <script>
+        var username;
+        document.addEventListener("DOMContentLoaded", async function() {
+            const session_id = localStorage.getItem("session_id");
+            
+            if (!session_id || session_id === "") {
+                alert("Please log in first.");
+                window.location.href = "login.html";
+            }
+
+            try {
+                const response = await fetch("/api/profile", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    // Populate form fields with existing profile data
+                    username = result.data.username;
+                    document.getElementById("username").textContent = result.data.username;
+                    document.getElementById("email").value = result.data.email;
+                    document.getElementById("bio").textContent = result.data.biography || "No bio available.";
+
+                    // Set profile picture if available
+                    if (result.profile_pic) {
+                        document.getElementById("profilePic").src = result.profile_pic;
+                    } else {
+                        // document.getElementById("profilePic").src = ""; // Default image
+                    }
+                } else {
+                    alert("Failed to fetch profile. Try again later.");
+                }
+            } catch (error) {
+                alert(error);
+            }
+        });
+
+        async function saveChanges() {
+            const session_id = localStorage.getItem("session_id");
+            if (!session_id || session_id === "") {
+                alert("Please log in first.");
+                window.location.href = "login.html";
+            }
+
+            const email = document.getElementById("email").value.trim();
+            const biography = document.getElementById("bio").value.trim();
+            const fileInput = document.getElementById("profilePicInput");
+            
+            // Default profile image as an empty string
+            let profile_image = "";
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                // Wait for the file to be read
+                reader.onload = async function (e) {
+                    profile_image = e.target.result; // Base64-encoded image
+
+                    // Proceed with sending the request after image is fully read
+                    await sendProfileUpdate(session_id, username, email, biography, profile_image);
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                // No file selected, proceed with an empty string
+                await sendProfileUpdate(session_id, username, email, biography, "");
+            }
+        }
+
+        async function sendProfileUpdate(session_id, username, email, biography, profile_image) {
+            try {
+                const requestBody = {
+                    session_id,
+                    username,
+                    email,
+                    biography,
+                    profile_image, // This will be Base64 or an empty string
+                };
+
+               
+
+                const response = await fetch("/api/editprofile", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestBody),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message || "Profile updated successfully!");
+                    window.location.href = "profile.html";
+                } else {
+                    alert(result.message || "Failed to update profile.");
+                }
+            } catch (error) {
+
+                alert("Something went wrong. Please try again.");
+            }
+        }
+
+
+        function goBack() {
+            window.location.href = "profile.html"; // Navigate back to the profile page
+        }
+    </script>
+</body>
+</html>

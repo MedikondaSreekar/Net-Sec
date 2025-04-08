@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Your Profile</h2>
+        
+        <!-- Profile Picture -->
+        <div class="profile-wrapper">
+            <img src="" alt="Profile Image" class="profile-image">
+        </div>
+        
+
+        <!-- Profile Details -->
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+        <p><strong>Balance:</strong><span id="balance"></span></p>
+        <label for="bio"><strong>Bio:</strong></label>
+        <div class="form-group">
+            <!-- Readonly Textarea for Output -->
+            <textarea id="bio" rows="5" readonly>This is the bio output. Users cannot edit this text.</textarea>
+        </div>
+
+        <!-- Buttons -->
+        <button onclick="editProfile()">Edit Profile</button>
+        <button onclick="homePage()">Home Page</button>
+        <button onclick="moneyTransfer()">Money Transfer</button>
+    </div>
+
+    <script>
+        async function fetchProfile() {
+            const session_id = localStorage.getItem("session_id");
+            
+            if (!session_id) {
+                alert("Please log in first.");
+                window.location.href = "login.html";
+            }
+        
+            try {
+                const response = await fetch("/api/profile", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id })
+                });
+        
+                const result = await response.json();
+        
+                if (response.ok) {
+                    // Update profile fields
+                    document.getElementById("username").textContent = result.data.username;
+                    document.getElementById("email").textContent = result.data.email;
+                    document.getElementById("balance").textContent = "Rupees " + (result.data.balance || 0);
+                    document.getElementById("bio").textContent = result.data.biography || "No bio available.";
+        
+                    // Handle profile image
+                    if (result.data.profile_image) {
+                        const img = document.querySelector(".profile-image");
+                        // Check if we need to add the data URL prefix
+                        if (!result.data.profile_image.startsWith('data:')) {
+                            // Default to JPEG if type unknown (should be handled by backend)
+                            img.src = `data:image/jpeg;base64,${result.data.profile_image}`;
+                        } else {
+                            img.src = result.data.profile_image;
+                        }
+                    }
+                } else {
+                    alert("Failed to fetch profile: " + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert("Something went wrong. Please try again.");
+            }
+        }
+        fetchProfile();
+
+
+        function editProfile() {
+            window.location.href = "edit-profile.html";
+        }
+
+        function homePage() {
+            window.location.href = "home.html";
+        }
+
+        function moneyTransfer() {
+            window.location.href = "money-transfer.html";
+        }
+
+    </script>
+        
+    
+</body>
+</html>

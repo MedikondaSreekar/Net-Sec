@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: netsecdb
+      DB_USER: postgres
+      DB_PASSWORD: parleg
+      SESSION_IV: kZyBZkfMYkIqBDH7XYyM7g==
+      SESSION_KEY: akJkuWv+vX8TDABIoa0L+BwU8GKK4TuQmEmAx8QBG4g=
+      SESSION_EXPIRATION: 420
+      DUMMY: dummy
+    volumes:
+      - ./backend:/var/www/html
+      - ./backend_config/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+
+  frontend:
+    image: nginx:latest
+    ports:
+      - "8083:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./frontend_config/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl

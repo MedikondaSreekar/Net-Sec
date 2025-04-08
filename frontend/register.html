@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        
+        <!-- Username Section -->
+        <input type="text" id="username" placeholder="Enter Username">
+        <!-- <button onclick="checkUsername()">Check Username</button> -->
+        <p id="usernameStatus"></p>
+
+        <!-- Registration Form -->
+        <input type="email" id="email" placeholder="Enter Email">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button onclick="registerUser()">Register</button>
+
+        <!-- Error Display -->
+        <p id="errorMessage" style="color: red;"></p>
+
+        <!-- Login Link -->
+        <p>Already have an account? <a href="login.html">Login</a></p>
+    </div>
+
+    <script>
+        // Function to register user
+        async function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            // Clear previous messages
+            document.getElementById('errorMessage').textContent = '';
+            document.getElementById('usernameStatus').textContent = '';
+
+            if (!username || !email || !password) {
+                document.getElementById('errorMessage').textContent = 'All fields are required';
+                return;
+            }
+
+            try {
+
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('Registration successful! Redirecting to login...');
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('errorMessage').textContent = result.message;
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>

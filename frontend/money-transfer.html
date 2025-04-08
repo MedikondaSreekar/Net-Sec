@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Transfer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Money Transfer</h2>
+
+        <!-- Receiver's Username -->
+        <label>Receiver Username</label>
+        <input type="text" id="toUser" placeholder="Enter receiver's username">
+
+        <!-- Transfer Amount -->
+        <label>Amount to Transfer</label>
+        <input type="number" id="amount" placeholder="Enter amount">
+
+        <!-- Optional Comments -->
+        <label>Comments</label>
+        <textarea id="comments" placeholder="Add a note (optional)"></textarea>
+
+        <!-- Transfer Button -->
+        <button onclick="transferMoney()">Send Money</button>
+
+        <button onclick="profile()">Profile</button>
+
+        <!-- Error Message -->
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
+
+    <script>
+        const session_id = localStorage.getItem('session_id');
+        const username = localStorage.getItem('username');
+
+        if (!session_id || !username) {
+            alert('You are not logged in. Redirecting to login page...');
+            window.location.href = 'login.html';
+        }  
+        
+
+        async function transferMoney() {
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+            }
+            const sessionId = getCookie('session_id');    
+
+            const to_username = document.getElementById('toUser').value.trim();
+            const quantity = document.getElementById('amount').value.trim();
+            const comments = document.getElementById('comments').value.trim();
+
+            // Clear previous error messages
+            document.getElementById('errorMessage').textContent = '';
+
+            // Basic validation
+            if (!to_username || !quantity) {
+                document.getElementById('errorMessage').textContent = 'Receiver username and amount are required.';
+                return;
+            }
+
+            if (quantity <= 0) {
+                document.getElementById('errorMessage').textContent = 'Enter a valid amount.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/moneytransfer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        session_id, 
+                        username, 
+                        to_username, 
+                        quantity, 
+                        comments 
+                    })
+                });
+
+                const result = await response.json();
+               
+                if (response.ok) {
+                    alert('Money transfer successful!');
+                    window.location.reload();
+                } else {
+                    document.getElementById('errorMessage').textContent = result.message;
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Transfer failed. Try again later.';
+            }
+        }
+        function profile(){
+            window.location.href = 'profile.html';
+        }
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+
+        <!-- Login Form -->
+        <input type="text" id="loginUsername" placeholder="Enter Username">
+        <input type="password" id="loginPassword" placeholder="Enter Password">
+        <button onclick="loginUser()">Login</button>
+
+        <!-- Error Display -->
+        <p id="loginErrorMessage" style="color: red;"></p>
+
+        <!-- Register Link -->
+        <p>Don't have an account? <a href="register.html">Register</a></p>
+    </div>
+
+    <script>
+        // Function to log in user
+        async function loginUser() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            // Clear previous messages
+            document.getElementById('loginErrorMessage').textContent = '';
+
+            if (!username || !password) {
+                document.getElementById('loginErrorMessage').textContent = 'All fields are required';
+                return;
+            }
+
+            try {
+              
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+              
+                
+                if (response.ok) {
+                    localStorage.setItem('session_id', result.session_id);
+                    localStorage.setItem('username', username);
+                    alert('Login successful! Redirecting...');
+                    window.location.href = 'home.html';
+                } else {
+                    document.getElementById('loginErrorMessage').textContent = result.message;
+                }
+            } catch (error) {
+                document.getElementById('loginErrorMessage').textContent = error.message;
+            }
+        }
+    </script>
+</body>
+</html>

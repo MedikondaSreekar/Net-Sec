@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>User Profile</h2>
+        
+        <!-- Profile Picture -->
+        <div class="profile-wrapper">
+            <img src="" alt="Profile Image" id="profileImage" class="profile-image">
+        </div>
+
+        <!-- Profile Details -->
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+        <div class="form-group">
+            <label for="bio"><strong>Bio:</strong></label>
+            <!-- Readonly Textarea for Output -->
+            <textarea id="bio" rows="5" readonly>This is the bio output. Users cannot edit this text.</textarea>
+        </div>
+
+        <!-- Back Button -->
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Retrieve user data from localStorage
+            const userData = localStorage.getItem("otherUser");
+
+            if (!userData) {
+                alert("No user data found. Redirecting to home page...");
+                window.location.href = "home.html"; // Redirect to home if no data is found
+                return;
+            }
+
+            try {
+                // Parse the user data
+                const user = JSON.parse(userData);
+
+                // Populate profile details
+                document.getElementById("username").textContent = user.username || "Not available";
+                document.getElementById("email").textContent = user.email || "Not available";
+                document.getElementById("bio").textContent = user.biography || "No bio available.";
+
+                // Set profile picture if available
+                if (user.profile_image) {
+                    document.getElementById("profileImage").src = user.profile_image;
+                } else {
+                    document.getElementById("profileImage").src = "default-profile.jpg"; // Default image
+                }
+            } catch (error) {
+                alert("Invalid user data. Redirecting to home page...");
+                window.location.href = "home.html";
+            }
+        });
+
+        function goBack() {
+            window.history.back(); // Navigate back to the previous page
+        }
+    </script>
+</body>
+</html>

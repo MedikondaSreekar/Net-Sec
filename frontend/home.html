@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Home Heading with Profile Button -->
+        <div class="header">
+            <h2>Home</h2>
+            <button id="profileButton" onclick="window.location.href='profile.html'">Profile</button>
+            <button id="transactionButton" onclick="window.location.href='transaction.html'">History</button>
+        </div>
+        
+        <!-- Search User -->
+        <h1>Search User</h1>
+        <input type="text" id="searchUser" placeholder="Search for a user">
+        <button onclick="findUser()">Search</button>
+        <p id="searchResult"></p>
+        
+        <!-- Receiver's Profile -->
+        <h3>Search Results</h3>
+        <button onclick="goToProfile()" id="searchResultsList" style="margin-inline:auto; display: none;">
+        </button>
+        <button id="" onclick="window.location.href='logout.html'">LogOut</button>
+        <!-- Error Message -->
+        <button id="profileButton" onclick="window.location.href='money-transfer.html'">Money Transfer</button>
+        <p id="errorMessage" style="color: red;"></p>
+    </div>
+
+    <script>
+        const session_id = localStorage.getItem('session_id');
+
+        if (!session_id) {
+            alert('You are not logged in. Redirecting to login page...');
+            window.location.href = 'login.html';
+        }
+
+        async function findUser() {
+            const searchUser = document.getElementById('searchUser').value;
+            const searchResultsList = document.getElementById('searchResultsList');
+            searchResultsList.innerHTML = ''; // Clear previous results
+
+            const response = await fetch('/api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    "session_id": session_id,
+                    "input": searchUser 
+                }),
+            });
+
+            const data = await response.json();
+            
+
+            if (data.error) {
+                document.getElementById('errorMessage').innerText = data.error;
+            } else {
+                document.getElementById('errorMessage').innerText = '';
+
+                // Extract the single user object
+                const user = data.users[0]; 
+                if (!user) {
+                    document.getElementById('errorMessage').innerText = "No user found.";
+                    return;
+                }
+
+                // Store user data in localStorage
+                localStorage.setItem('otherUser', JSON.stringify(user));
+
+                // Display user in the search results
+                searchResultsList.innerHTML = `
+                    <p>GO TO PROFILE</p>
+                `;
+
+                searchResultsList.style.display = 'block';
+            }
+        }
+        function goToProfile() {
+            window.location.href = '/other_profile.html';
+        }
+
+    </script>
+</body>
+</html>
