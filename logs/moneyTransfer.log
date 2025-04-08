@@ -1,0 +1,10 @@
+[SUCCESSFUL TRANSACTION] | [2025-03-18 02:22:11] | FROM - cs22btech1103 | TO - cs22btech1103 | AMOUNT - 50.00 | COMMENT - eee
+[SUCCESSFUL TRANSACTION] | [2025-03-18 02:23:00] | FROM - cs22btech1103 | TO - cs22btech11038 | AMOUNT - 30.00 | COMMENT - hhh
+[FAILED TRANSACTION] - Cannot transfer to self | 2025-03-18 02:25:25 | FROM - cs22btech1103 | TO - cs22btech1103 | AMOUNT - 66.00 | COMMENT - 
+[FAILED TRANSACTION] - Comments cannot contain > or < symbols | 2025-03-18 02:26:53 | FROM - cs22btech1103 | TO - cs22btech11038 | AMOUNT - 33.00 | COMMENT - <<
+[FAILED TRANSACTION] - Invalid comment | 2025-03-18 02:27:22 | FROM - cs22btech1103 | TO - cs22btech11038 | AMOUNT - 33.00 | COMMENT - <<
+[SUCCESSFUL TRANSACTION] | [2025-03-18 03:41:58] | FROM - cs22btech1103 | TO - cs22btech11038 | AMOUNT - 44.00 | COMMENT - jj
+[FAILED TRANSACTION] - Recipient account not found | 2025-03-23 23:45:50 | FROM - armaan | TO - sriman1 | AMOUNT - 10.00 | COMMENT - 
+[SUCCESSFUL TRANSACTION] | [2025-03-23 23:46:02] | FROM - armaan | TO - sriman | AMOUNT - 10.00 | COMMENT - hey sriman, this is armaan
+[FAILED TRANSACTION] - Insufficient funds | 2025-03-23 23:47:09 | FROM - armaan | TO - sriman | AMOUNT - 100.00 | COMMENT - Invalid
+[SUCCESSFUL TRANSACTION] | [2025-03-23 23:47:40] | FROM - armaan | TO - sriman | AMOUNT - 90.00 | COMMENT - Valid
